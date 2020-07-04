@@ -16,10 +16,12 @@
 package io.netty.example.discard;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.CharsetUtil;
 
 /**
  * Handles a client-side channel.
@@ -36,7 +38,7 @@ public class DiscardClientHandler extends SimpleChannelInboundHandler<Object> {
         // Initialize the message.
         content = ctx.alloc().directBuffer(DiscardClient.SIZE).writeZero(DiscardClient.SIZE);
 
-        // Send the initial messages.
+        // 发送初始化消息
         generateTraffic();
     }
 
@@ -45,9 +47,18 @@ public class DiscardClientHandler extends SimpleChannelInboundHandler<Object> {
         content.release();
     }
 
+    /**
+     * 当通道有读取事件的时候，就会出发改事件
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         // Server is supposed to send nothing, but if it sends something, discard it.
+        ByteBuf buf = (ByteBuf)msg;
+        System.out.println("服务端返回的数据：" + buf.toString(CharsetUtil.UTF_8));
+        System.out.println("服务端地址：" + ctx.channel().remoteAddress());
     }
 
     @Override
@@ -62,7 +73,9 @@ public class DiscardClientHandler extends SimpleChannelInboundHandler<Object> {
     private void generateTraffic() {
         // Flush the outbound buffer to the socket.
         // Once flushed, generate the same amount of traffic again.
-        ctx.writeAndFlush(content.retainedDuplicate()).addListener(trafficGenerator);
+        //ctx.writeAndFlush(content.retainedDuplicate()).addListener(trafficGenerator);
+
+        ctx.writeAndFlush(Unpooled.copiedBuffer("hhh", CharsetUtil.UTF_8));
     }
 
     private final ChannelFutureListener trafficGenerator = new ChannelFutureListener() {

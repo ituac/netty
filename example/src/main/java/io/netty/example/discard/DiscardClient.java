@@ -63,12 +63,13 @@ public final class DiscardClient {
                  }
              });
 
-            // Make the connection attempt.
+            // 启动客户端连接服务端 ChannelFuture：异步模型
             ChannelFuture f = b.connect(HOST, PORT).sync();
 
-            // Wait until the connection is closed.
+            // 进行关闭监听
             f.channel().closeFuture().sync();
         } finally {
+            //优雅的关闭
             group.shutdownGracefully();
         }
     }
