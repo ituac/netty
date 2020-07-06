@@ -58,6 +58,9 @@ public class DiscardTimeLongHandler extends SimpleChannelInboundHandler<Object> 
             public void run() {
                 try{
                     Thread.sleep(10 * 1000);
+
+
+                    //Unpooled：Unpooled获取Netty数据容器的bytebuf的基本使用
                     ctx.writeAndFlush(Unpooled.copiedBuffer("hello-2客户端:",CharsetUtil.UTF_8));
                 }catch (Exception e){
 
@@ -69,7 +72,6 @@ public class DiscardTimeLongHandler extends SimpleChannelInboundHandler<Object> 
 
 
         // 通过Handler之外的代码进行系统调用我们通道进行添加任务
-
         ByteBuf buf = (ByteBuf)msg;
         System.out.printf("time-out-客户端发送的数据：" + buf.toString(CharsetUtil.UTF_8));
         System.out.printf("time-out-客户端地址：" + ctx.channel().remoteAddress());
